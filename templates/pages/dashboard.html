@@ -1,0 +1,170 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div id="view-dashboard" class="view-page space-y-6">
+  
+  <!-- Hero / Platform Status Overview Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-[#121212] via-[#161616] to-[#121212] p-6 rounded-2xl border border-white/10 relative overflow-hidden">
+    <div class="space-y-1 z-10">
+      <div class="flex items-center space-x-2">
+        <span class="text-xs font-mono text-[#C5A059] uppercase tracking-wider">PLATFORM TELEMETRY</span>
+        <span class="text-white/20">•</span>
+        <span class="text-xs font-mono text-emerald-400">DJANGO 5.0 ENGINE</span>
+      </div>
+      <h1 class="text-2xl font-serif text-white font-bold tracking-tight">Software Engineering Command Center</h1>
+      <p class="text-xs text-white/60 max-w-xl">Autonomous multi-agent orchestration for end-to-end software specifications, system topology, C++ & Python code generation, and OWASP security validation.</p>
+    </div>
+
+    <div class="flex items-center space-x-3 z-10">
+      <a href="{% url 'requirements' %}" data-view="requirements" class="bg-[#C5A059] text-[#0D0D0D] font-semibold text-xs px-4 py-2.5 rounded-lg hover:bg-[#d8b46d] transition-colors flex items-center space-x-2 shadow-lg">
+        <i class="bi bi-plus-lg"></i>
+        <span>New AI Requirement Spec</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Metrics Row (5 Cards) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    
+    <div class="nexus-card p-4 space-y-2">
+      <div class="flex items-center justify-between text-white/50 text-xs font-mono">
+        <span>PROJECTS</span>
+        <i class="bi bi-folder2 text-[#C5A059]"></i>
+      </div>
+      <div class="text-2xl font-serif font-bold text-white">{{ projects|length }}</div>
+      <div class="text-[10px] text-emerald-400 font-mono"><i class="bi bi-arrow-up-right"></i> {{ active_project.name|truncatechars:18 }}</div>
+    </div>
+
+    <div class="nexus-card p-4 space-y-2">
+      <div class="flex items-center justify-between text-white/50 text-xs font-mono">
+        <span>SWARM AGENTS</span>
+        <i class="bi bi-cpu text-[#C5A059]"></i>
+      </div>
+      <div class="text-2xl font-serif font-bold text-[#C5A059]">{{ active_agents_count|default:6 }}</div>
+      <div class="text-[10px] text-white/40 font-mono">100% Sync Accuracy</div>
+    </div>
+
+    <div class="nexus-card p-4 space-y-2">
+      <div class="flex items-center justify-between text-white/50 text-xs font-mono">
+        <span>EXTRACTED SPECS</span>
+        <i class="bi bi-card-checklist text-[#C5A059]"></i>
+      </div>
+      <div class="text-2xl font-serif font-bold text-white">{{ requirements|length }}</div>
+      <div class="text-[10px] text-white/40 font-mono">{{ requirements|length }} Approved PRD items</div>
+    </div>
+
+    <div class="nexus-card p-4 space-y-2">
+      <div class="flex items-center justify-between text-white/50 text-xs font-mono">
+        <span>TOPOLOGY NODES</span>
+        <i class="bi bi-diagram-3 text-[#C5A059]"></i>
+      </div>
+      <div class="text-2xl font-serif font-bold text-white">{{ arch_nodes|length }}</div>
+      <div class="text-[10px] text-emerald-400 font-mono">Avg Latency 0.8ms</div>
+    </div>
+
+    <div class="nexus-card p-4 space-y-2">
+      <div class="flex items-center justify-between text-white/50 text-xs font-mono">
+        <span>SECURITY AUDIT</span>
+        <i class="bi bi-shield-check text-[#10B981]"></i>
+      </div>
+      <div class="text-2xl font-serif font-bold text-[#10B981]">98.5%</div>
+      <div class="text-[10px] text-emerald-400 font-mono">OWASP Top 10 Compliant</div>
+    </div>
+
+  </div>
+
+  <!-- Software Engineering Lifecycle Progress Bar -->
+  <div class="nexus-card-gold p-6 space-y-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="w-2 h-2 rounded-full bg-[#C5A059] animate-pulse"></span>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Software Development Lifecycle Pipeline</h3>
+      </div>
+      <span class="text-xs font-mono text-[#C5A059]">STAGE 5 / 8 — CODE GENERATION & REFACTORING</span>
+    </div>
+
+    <!-- Lifecycle Steps Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center text-xs font-mono">
+      <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">1. Idea</div>
+      <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">2. Specs</div>
+      <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">3. Architecture</div>
+      <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">4. Database</div>
+      <div class="p-2.5 rounded-lg bg-[#C5A059]/20 border border-[#C5A059] text-[#C5A059] font-bold shadow-md">5. Code</div>
+      <div class="p-2.5 rounded-lg bg-white/5 border border-white/10 text-white/50">6. Testing</div>
+      <div class="p-2.5 rounded-lg bg-white/5 border border-white/10 text-white/50">7. Review</div>
+      <div class="p-2.5 rounded-lg bg-white/5 border border-white/10 text-white/50">8. Docs</div>
+    </div>
+  </div>
+
+  <!-- Main Grid: Active Requirements Specs & System Architecture Snippet -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    
+    <!-- Left Column: Active Requirement Specs List -->
+    <div class="nexus-card p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider flex items-center space-x-2">
+          <i class="bi bi-card-checklist text-[#C5A059]"></i>
+          <span>Extracted Specification Items</span>
+        </h3>
+        <a href="{% url 'requirements' %}" data-view="requirements" class="text-xs text-[#C5A059] hover:underline font-mono">View All &rarr;</a>
+      </div>
+
+      <div class="space-y-3">
+        {% for req in requirements %}
+        <div class="p-3.5 rounded-xl bg-[#121212] border border-white/10 hover:border-white/20 transition-all space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-white">{{ req.title }}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded font-mono uppercase {% if req.priority == 'high' %}bg-rose-500/10 text-rose-400 border border-rose-500/30{% else %}bg-amber-500/10 text-amber-400 border border-amber-500/30{% endif %}">
+              {{ req.priority }}
+            </span>
+          </div>
+          <p class="text-xs text-white/60 line-clamp-2">{{ req.description }}</p>
+          <div class="flex items-center justify-between text-[10px] font-mono text-white/40 pt-1">
+            <span>TYPE: {{ req.req_type|upper }}</span>
+            <span class="text-emerald-400">STATUS: {{ req.status|upper }}</span>
+          </div>
+        </div>
+        {% empty %}
+        <div class="p-4 text-center text-xs text-white/40 font-mono">No requirement specifications extracted yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Right Column: Microservices Architecture Nodes Preview -->
+    <div class="nexus-card p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider flex items-center space-x-2">
+          <i class="bi bi-diagram-3-fill text-[#C5A059]"></i>
+          <span>Active Architecture Topology</span>
+        </h3>
+        <a href="{% url 'architecture' %}" data-view="architecture" class="text-xs text-[#C5A059] hover:underline font-mono">Interactive Topology &rarr;</a>
+      </div>
+
+      <div class="space-y-3">
+        {% for node in arch_nodes %}
+        <div class="p-3.5 rounded-xl bg-[#121212] border border-white/10 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-[#C5A059]/10 border border-[#C5A059]/30 flex items-center justify-center text-[#C5A059] text-sm">
+              <i class="bi bi-box-seam"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-semibold text-white">{{ node.label }}</h4>
+              <p class="text-[10px] text-white/50 font-mono">{{ node.sublabel }}</p>
+            </div>
+          </div>
+          <div class="text-right text-[10px] font-mono">
+            <div class="text-emerald-400 font-semibold">{{ node.status|upper }}</div>
+            <div class="text-white/40">CPU: {{ node.cpu }} | Latency: {{ node.latency }}</div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="p-4 text-center text-xs text-white/40 font-mono">No topology nodes configured.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

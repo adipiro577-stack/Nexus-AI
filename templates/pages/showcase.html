@@ -1,0 +1,91 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div id="view-showcase" class="view-page space-y-6">
+  
+  <div>
+    <h1 class="text-xl font-serif text-white font-bold tracking-tight">Interactive Order Matching Engine Sandbox</h1>
+    <p class="text-xs text-white/60">Live interactive execution demo testing microsecond order book double queues, C++ engine bindings, and Redis RESP event streams.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Order Entry Form -->
+    <div class="nexus-card-gold p-6 space-y-4">
+      <h3 class="text-xs font-mono font-bold text-white uppercase border-b border-white/10 pb-3 flex items-center space-x-2">
+        <i class="bi bi-currency-exchange text-[#C5A059]"></i>
+        <span>Submit Limit Order</span>
+      </h3>
+
+      <form id="order-submit-form" class="space-y-4 text-xs font-mono">
+        <div class="space-y-1">
+          <label class="text-white/50 uppercase">Trading Pair Symbol</label>
+          <select id="order-symbol" class="w-full bg-[#0D0D0D] border border-white/10 rounded-lg p-2.5 text-white">
+            <option value="BTC-USD">BTC-USD (Bitcoin)</option>
+            <option value="ETH-USD">ETH-USD (Ethereum)</option>
+            <option value="SOL-USD">SOL-USD (Solana)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-white/50 uppercase">Order Side</label>
+            <select id="order-side" class="w-full bg-[#0D0D0D] border border-white/10 rounded-lg p-2.5 text-emerald-400 font-bold">
+              <option value="BUY">BUY (Bid)</option>
+              <option value="SELL">SELL (Ask)</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="text-white/50 uppercase">Limit Price ($)</label>
+            <input type="number" id="order-price" value="68500.00" step="0.01" class="w-full bg-[#0D0D0D] border border-white/10 rounded-lg p-2.5 text-white">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-white/50 uppercase">Quantity (Units)</label>
+          <input type="number" id="order-qty" value="0.5" step="0.01" class="w-full bg-[#0D0D0D] border border-white/10 rounded-lg p-2.5 text-white">
+        </div>
+
+        <button type="submit" class="w-full bg-[#C5A059] text-[#0D0D0D] font-bold py-3 rounded-lg hover:bg-[#d8b46d] transition-all flex items-center justify-center space-x-2">
+          <i class="bi bi-[#C5A059] bi-lightning-charge-fill"></i>
+          <span>Submit & Match Order</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Live Order Book Depth & RESP Stream Stream -->
+    <div class="lg:col-span-2 nexus-card p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-xs font-mono font-bold text-white uppercase flex items-center space-x-2">
+          <i class="bi bi-list-columns-reverse text-[#C5A059]"></i>
+          <span>Matched Order Ledger Stream (Microsecond Latency)</span>
+        </h3>
+        <span class="text-[10px] font-mono text-emerald-400">● RESP LIVE</span>
+      </div>
+
+      <div id="order-book-ledger" class="space-y-1 max-h-96 overflow-y-auto">
+        <div class="flex items-center justify-between py-1.5 px-3 border-b border-white/5 text-xs font-mono">
+          <span class="text-white/50">08:35:10</span>
+          <span class="font-semibold text-white">BTC-USD</span>
+          <span class="text-emerald-400 font-bold">BUY</span>
+          <span>$68,500.00</span>
+          <span>0.50</span>
+          <span class="text-emerald-400"><i class="bi bi-check2"></i> MATCHED</span>
+        </div>
+
+        <div class="flex items-center justify-between py-1.5 px-3 border-b border-white/5 text-xs font-mono">
+          <span class="text-white/50">08:34:55</span>
+          <span class="font-semibold text-white">ETH-USD</span>
+          <span class="text-rose-400 font-bold">SELL</span>
+          <span>$3,420.00</span>
+          <span>2.00</span>
+          <span class="text-emerald-400"><i class="bi bi-check2"></i> MATCHED</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

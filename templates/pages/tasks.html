@@ -1,0 +1,118 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div id="view-tasks" class="view-page space-y-6">
+  
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-serif text-white font-bold tracking-tight">Sprint Kanban & Agent Task Management</h1>
+      <p class="text-xs text-white/60">Organize sprint tasks assigned to autonomous AI Agents across the development lifecycle.</p>
+    </div>
+
+    <button data-modal-target="add-task-modal" class="bg-[#C5A059] text-[#0D0D0D] font-bold text-xs px-4 py-2.5 rounded-lg hover:bg-[#d8b46d] transition-all flex items-center space-x-2 shadow-lg">
+      <i class="bi bi-plus-lg"></i>
+      <span>Add New Task</span>
+    </button>
+  </div>
+
+  <!-- Kanban Board Columns Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    
+    <!-- Column 1: Backlog -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between p-3 rounded-xl bg-[#121212] border border-white/10 text-xs font-mono font-bold text-white">
+        <span>BACKLOG</span>
+        <span class="text-white/40">1</span>
+      </div>
+      <div class="nexus-card p-4 space-y-2">
+        <span class="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded">HIGH PRIORITY</span>
+        <h4 class="text-xs font-semibold text-white">Refactor C++ Order Book Bindings</h4>
+        <p class="text-xs text-white/60">Expose pybind11 wrappers to Django async channel handlers.</p>
+        <div class="pt-2 text-[10px] font-mono text-[#C5A059]">Agent: Code Generator Agent</div>
+      </div>
+    </div>
+
+    <!-- Column 2: In Progress -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between p-3 rounded-xl bg-[#121212] border border-white/10 text-xs font-mono font-bold text-[#C5A059]">
+        <span>IN PROGRESS</span>
+        <span class="text-[#C5A059]">1</span>
+      </div>
+      <div class="nexus-card-gold p-4 space-y-2">
+        <span class="text-[10px] font-mono text-[#C5A059] bg-[#C5A059]/10 px-2 py-0.5 rounded">MEDIUM PRIORITY</span>
+        <h4 class="text-xs font-semibold text-white">Optimize Redis RESP Stream Latency</h4>
+        <p class="text-xs text-white/60">Benchmark microsecond order stream consumer pipelines.</p>
+        <div class="pt-2 text-[10px] font-mono text-[#C5A059]">Agent: Architect Agent</div>
+      </div>
+    </div>
+
+    <!-- Column 3: Review -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between p-3 rounded-xl bg-[#121212] border border-white/10 text-xs font-mono font-bold text-sky-400">
+        <span>CODE REVIEW</span>
+        <span class="text-sky-400">1</span>
+      </div>
+      <div class="nexus-card p-4 space-y-2">
+        <span class="text-[10px] font-mono text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded">REVIEW</span>
+        <h4 class="text-xs font-semibold text-white">JWT Access Token Scope Enforcement</h4>
+        <p class="text-xs text-white/60">Verify Bearer auth checks on rest endpoints.</p>
+        <div class="pt-2 text-[10px] font-mono text-sky-400">Agent: QA Test Agent</div>
+      </div>
+    </div>
+
+    <!-- Column 4: Completed -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between p-3 rounded-xl bg-[#121212] border border-white/10 text-xs font-mono font-bold text-emerald-400">
+        <span>COMPLETED</span>
+        <span class="text-emerald-400">2</span>
+      </div>
+      <div class="nexus-card p-4 space-y-2">
+        <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">DONE</span>
+        <h4 class="text-xs font-semibold text-white">OWASP Top 10 Security Scan</h4>
+        <p class="text-xs text-white/60">Audit input sanitization and parameterized queries.</p>
+        <div class="pt-2 text-[10px] font-mono text-emerald-400">Agent: QA Test Agent</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Add Task Modal -->
+<div id="add-task-modal" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-[#121212] border border-white/20 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <h3 class="text-base font-semibold text-white">Add Task Item</h3>
+      <button data-modal-close class="text-white/40 hover:text-white text-lg"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <form method="POST" action="{% url 'tasks' %}" class="space-y-4 text-xs">
+      {% csrf_token %}
+      <div class="space-y-1">
+        <label class="text-white/70 font-semibold uppercase">Title</label>
+        {{ form.title }}
+      </div>
+      <div class="space-y-1">
+        <label class="text-white/70 font-semibold uppercase">Description</label>
+        {{ form.description }}
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1">
+          <label class="text-white/70 font-semibold uppercase">Assigned Agent</label>
+          {{ form.assigned_agent }}
+        </div>
+        <div class="space-y-1">
+          <label class="text-white/70 font-semibold uppercase">Priority</label>
+          {{ form.priority }}
+        </div>
+      </div>
+      
+      <div class="pt-2 flex justify-end space-x-3">
+        <button type="button" data-modal-close class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70">Cancel</button>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-[#C5A059] text-[#0D0D0D] font-semibold hover:bg-[#d8b46d]">Save Task</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

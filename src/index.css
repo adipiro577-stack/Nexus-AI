@@ -1,0 +1,56 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+
+@layer base {
+  body {
+    background-color: #0d0d0d;
+    color: #e5e5e5;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-display {
+    font-family: 'Cinzel', 'Playfair Display', serif;
+  }
+}
+
+/* Custom scrollbars for dark luxury theme */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(197, 160, 89, 0.25);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(197, 160, 89, 0.5);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #FFF0D0 0%, #C5A059 50%, #9A7B38 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-border-glow {
+  box-shadow: 0 0 25px -5px rgba(197, 160, 89, 0.15);
+}
+
+.card-luxury {
+  background-color: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: all 0.25s ease-in-out;
+}
+
+.card-luxury:hover {
+  border-color: rgba(197, 160, 89, 0.35);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8), 0 0 15px -3px rgba(197, 160, 89, 0.1);
+}
+

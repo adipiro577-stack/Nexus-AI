@@ -1,0 +1,108 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div id="view-database" class="view-page space-y-6">
+  
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-serif text-white font-bold tracking-tight">Database Schema & Django ORM Designer</h1>
+      <p class="text-xs text-white/60">Inspect PostgreSQL relational table models, column constraints, primary/foreign key links, and auto-generated Django ORM code.</p>
+    </div>
+
+    <button data-copy="from django.db import models
+
+class Order(models.Model):
+    id = models.UUIDField(primary_key=True)
+    user_id = models.BigIntegerField()
+    symbol = models.CharField(max_length=20)
+    side = models.CharField(max_length=4)
+    price = models.DecimalField(max_digits=18, decimal_places=8)
+    quantity = models.DecimalField(max_digits=18, decimal_places=8)
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)" class="bg-[#C5A059] text-[#0D0D0D] font-bold text-xs px-4 py-2.5 rounded-lg hover:bg-[#d8b46d] transition-all flex items-center space-x-2 shadow-lg">
+      <i class="bi bi-clipboard-check"></i>
+      <span>Copy Django models.py</span>
+    </button>
+  </div>
+
+  <!-- Schema Table Inspector -->
+  {% for table in db_tables %}
+  <div class="nexus-card p-6 space-y-4">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-[#C5A059]/10 border border-[#C5A059]/40 flex items-center justify-center text-[#C5A059]">
+          <i class="bi bi-table"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-white font-mono">{{ table.name }}</h3>
+          <p class="text-xs text-white/50">{{ table.description }}</p>
+        </div>
+      </div>
+      <span class="text-[10px] font-mono text-[#C5A059] bg-[#C5A059]/10 px-2.5 py-1 rounded border border-[#C5A059]/30">POSTGRESQL TABLE</span>
+    </div>
+
+    <!-- Columns Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs font-mono">
+        <thead class="bg-white/5 text-white/40 uppercase text-[10px]">
+          <tr>
+            <th class="p-3">Column Name</th>
+            <th class="p-3">Data Type</th>
+            <th class="p-3">Primary Key</th>
+            <th class="p-3">Nullable</th>
+            <th class="p-3">Foreign Key</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5 text-white/80">
+          {% for col in table.columns %}
+          <tr class="hover:bg-white/5">
+            <td class="p-3 font-semibold text-white flex items-center space-x-2">
+              {% if col.pk %}<i class="bi bi-key-fill text-[#C5A059]"></i>{% endif %}
+              <span>{{ col.name }}</span>
+            </td>
+            <td class="p-3 text-[#C5A059]">{{ col.type }}</td>
+            <td class="p-3">{% if col.pk %}<span class="text-emerald-400 font-bold">YES</span>{% else %}<span class="text-white/30">NO</span>{% endif %}</td>
+            <td class="p-3">{% if col.nullable %}<span class="text-white/60">YES</span>{% else %}<span class="text-rose-400 font-bold">NOT NULL</span>{% endif %}</td>
+            <td class="p-3 text-sky-400">{% if col.fk %}{{ col.fk }}{% else %}<span class="text-white/20">—</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Generated Code Preview Snippet Card -->
+  <div class="nexus-card-gold p-6 space-y-3">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <div class="flex items-center space-x-2 text-xs font-mono text-[#C5A059]">
+        <i class="bi bi-code-square"></i>
+        <span class="font-bold uppercase">GENERATED DJANGO ORM CODE</span>
+      </div>
+      <button data-copy="class Order(models.Model):
+    id = models.UUIDField(primary_key=True)
+    user_id = models.BigIntegerField()
+    symbol = models.CharField(max_length=20)
+    side = models.CharField(max_length=4)
+    price = models.DecimalField(max_digits=18, decimal_places=8)
+    quantity = models.DecimalField(max_digits=18, decimal_places=8)
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)" class="text-xs text-[#C5A059] hover:underline font-mono"><i class="bi bi-copy mr-1"></i>Copy Code</button>
+    </div>
+
+    <pre class="terminal-box p-4 text-xs overflow-x-auto leading-relaxed"><code>from django.db import models
+
+class Order(models.Model):
+    id = models.UUIDField(primary_key=True)
+    user_id = models.BigIntegerField()
+    symbol = models.CharField(max_length=20)
+    side = models.CharField(max_length=4)
+    price = models.DecimalField(max_digits=18, decimal_places=8)
+    quantity = models.DecimalField(max_digits=18, decimal_places=8)
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)</code></pre>
+  </div>
+
+</div>
+{% endblock %}

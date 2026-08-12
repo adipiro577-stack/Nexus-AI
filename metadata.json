@@ -1,0 +1,6 @@
+{
+  "name": "NexusAI",
+  "description": "Multi-agent AI workspace for automated software lifecycle engineering, architecture design, requirement analysis, and code studio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

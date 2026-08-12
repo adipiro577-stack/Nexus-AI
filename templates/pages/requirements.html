@@ -1,0 +1,128 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div id="view-requirements" class="view-page space-y-6">
+  
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-serif text-white font-bold tracking-tight">AI Requirement Specification Analyzer</h1>
+      <p class="text-xs text-white/60">Input raw natural language project requirements to generate structured technical specifications via Gemini 3.6 Flash.</p>
+    </div>
+
+    <button data-modal-target="add-req-modal" class="bg-white/10 hover:bg-white/15 text-white font-semibold text-xs px-4 py-2.5 rounded-lg border border-white/10 transition-colors flex items-center space-x-2">
+      <i class="bi bi-plus-lg"></i>
+      <span>Add Manual Specification</span>
+    </button>
+  </div>
+
+  <!-- AI Generator Input Card -->
+  <div class="nexus-card-gold p-6 space-y-4">
+    <div class="flex items-center space-x-2 text-xs font-mono text-[#C5A059]">
+      <i class="bi bi-cpu-fill"></i>
+      <span class="font-bold uppercase">GEMINI 3.6 FLASH REQUIREMENT ENGINE</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="md:col-span-3 space-y-1">
+        <label class="text-[10px] font-mono text-white/50 uppercase">Raw Natural Language Prompt</label>
+        <textarea id="ai-raw-prompt" rows="3" placeholder="Describe your software requirement or system capability (e.g. 'Build a high-frequency order book matching engine with microsecond latency, OAuth2 JWT auth, and Redis event stream ledger')..." class="w-full bg-[#0D0D0D] border border-white/10 rounded-xl p-3 text-xs text-white focus:border-[#C5A059] outline-none leading-relaxed"></textarea>
+      </div>
+
+      <div class="space-y-3 flex flex-col justify-between">
+        <div class="space-y-1">
+          <label class="text-[10px] font-mono text-white/50 uppercase">Category</label>
+          <select id="ai-prompt-category" class="w-full bg-[#0D0D0D] border border-white/10 rounded-xl p-3 text-xs text-white focus:border-[#C5A059] outline-none">
+            <option value="FinTech">FinTech / Trading Engine</option>
+            <option value="AI Infrastructure">AI Multi-Agent Bus</option>
+            <option value="Security">OAuth2 / DevSecOps</option>
+            <option value="General">General Microservice</option>
+          </select>
+        </div>
+
+        <button id="btn-analyze-reqs" class="w-full bg-[#C5A059] text-[#0D0D0D] font-bold text-xs py-3 rounded-xl hover:bg-[#d8b46d] transition-all flex items-center justify-center space-x-2 shadow-lg">
+          <i class="bi bi-cpu"></i>
+          <span>Analyze & Extract Specs with Gemini</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Extracted Specification Items Grid -->
+  <div class="space-y-4">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Active PRD Specifications ({{ requirements|length }})</h3>
+      <div class="flex items-center space-x-2 text-xs font-mono">
+        <span class="text-white/40">FILTER:</span>
+        <button class="bg-[#1A1A1A] text-[#C5A059] border border-[#C5A059]/40 px-2.5 py-1 rounded">ALL</button>
+        <button class="bg-white/5 text-white/60 hover:text-white px-2.5 py-1 rounded">HIGH PRIORITY</button>
+      </div>
+    </div>
+
+    <div id="reqs-results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for req in requirements %}
+      <div class="nexus-card p-5 space-y-3 hover:border-white/20 transition-all flex flex-col justify-between">
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded uppercase {% if req.priority == 'high' %}bg-rose-500/10 text-rose-400 border border-rose-500/30{% else %}bg-amber-500/10 text-amber-400 border border-amber-500/30{% endif %}">
+              {{ req.priority }} PRIORITY
+            </span>
+            <span class="text-[10px] font-mono text-emerald-400 uppercase bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
+              {{ req.status }}
+            </span>
+          </div>
+
+          <h4 class="text-sm font-semibold text-white">{{ req.title }}</h4>
+          <p class="text-xs text-white/60 leading-relaxed">{{ req.description }}</p>
+        </div>
+
+        <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-white/40">
+          <span>TYPE: {{ req.req_type|upper }}</span>
+          <span>COMPLEXITY: {{ req.complexity }}</span>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-span-full p-8 text-center text-white/40 font-mono">No requirement specifications extracted. Enter prompt above.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<!-- Manual Requirement Modal -->
+<div id="add-req-modal" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-[#121212] border border-white/20 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <h3 class="text-base font-semibold text-white">Add Specification Item</h3>
+      <button data-modal-close class="text-white/40 hover:text-white text-lg"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <form method="POST" action="{% url 'requirements' %}" class="space-y-4 text-xs">
+      {% csrf_token %}
+      <div class="space-y-1">
+        <label class="text-white/70 font-semibold uppercase">Title</label>
+        {{ form.title }}
+      </div>
+      <div class="space-y-1">
+        <label class="text-white/70 font-semibold uppercase">Description</label>
+        {{ form.description }}
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1">
+          <label class="text-white/70 font-semibold uppercase">Priority</label>
+          {{ form.priority }}
+        </div>
+        <div class="space-y-1">
+          <label class="text-white/70 font-semibold uppercase">Type</label>
+          {{ form.req_type }}
+        </div>
+      </div>
+      
+      <div class="pt-2 flex justify-end space-x-3">
+        <button type="button" data-modal-close class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70">Cancel</button>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-[#C5A059] text-[#0D0D0D] font-semibold hover:bg-[#d8b46d]">Save Spec Item</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

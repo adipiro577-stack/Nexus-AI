@@ -1,0 +1,40 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div id="view-notifications" class="view-page space-y-6">
+  
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-serif text-white font-bold tracking-tight">Audit Notifications & Swarm Alerts</h1>
+      <p class="text-xs text-white/60">Real-time alerts for agent task completions, architecture topology updates, and security scans.</p>
+    </div>
+
+    <button onclick="showToast('Notifications Cleared', 'All notification items marked as read.', 'success')" class="bg-white/10 hover:bg-white/15 text-white font-semibold text-xs px-4 py-2.5 rounded-lg border border-white/10 transition-colors flex items-center space-x-2">
+      <i class="bi bi-check-all"></i>
+      <span>Mark All as Read</span>
+    </button>
+  </div>
+
+  <!-- Notifications List -->
+  <div class="space-y-3">
+    {% for notif in notifications %}
+    <div class="nexus-card p-4 flex items-start space-x-4 hover:border-white/20 transition-all">
+      <div class="w-8 h-8 rounded-lg bg-[#C5A059]/10 border border-[#C5A059]/30 flex items-center justify-center text-[#C5A059] shrink-0 mt-0.5">
+        <i class="bi bi-bell-fill text-sm"></i>
+      </div>
+      <div class="flex-1 space-y-1">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-semibold text-white">{{ notif.title }}</h4>
+          <span class="text-[10px] font-mono text-white/40">{{ notif.timestamp }}</span>
+        </div>
+        <p class="text-xs text-white/60 leading-relaxed">{{ notif.message }}</p>
+      </div>
+    </div>
+    {% empty %}
+    <div class="p-8 text-center text-xs font-mono text-white/40">No notifications.</div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

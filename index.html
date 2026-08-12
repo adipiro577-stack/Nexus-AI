@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusAI — Autonomous Software Engineering Platform</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Custom NexusAI CSS -->
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body class="bg-[#0D0D0D] text-[#E5E5E5] flex flex-col min-h-screen font-sans selection:bg-[#C5A059]/30 selection:text-white">
+
+  <div class="min-h-screen flex flex-col bg-[#0D0D0D]">
+    <!-- Top Navbar -->
+    <header class="h-16 border-b border-white/10 bg-[#0A0A0A]/90 backdrop-blur-md sticky top-0 z-40 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <button id="sidebar-toggle" class="lg:hidden text-white/70 hover:text-white text-xl">
+          <i class="bi bi-list"></i>
+        </button>
+        
+        <a href="#" onclick="showView('dashboard')" class="flex items-center space-x-3 group">
+          <div class="w-8 h-8 rounded-lg bg-[#C5A059]/10 border border-[#C5A059]/40 flex items-center justify-center text-[#C5A059] group-hover:scale-105 transition-transform">
+            <i class="bi bi-cpu text-lg"></i>
+          </div>
+          <div>
+            <span class="font-serif text-white font-bold tracking-widest text-sm uppercase">NEXUS<span class="text-[#C5A059]">AI</span></span>
+            <span class="text-[9px] block text-white/40 tracking-wider font-mono">AUTONOMOUS ENG PLATFORM</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="hidden md:flex items-center space-x-2 bg-[#121212] border border-white/10 hover:border-white/20 rounded-full px-4 py-1.5 cursor-pointer text-xs text-white/50 w-72 justify-between" onclick="document.getElementById('command-palette-modal').classList.remove('hidden')">
+        <span class="flex items-center space-x-2">
+          <i class="bi bi-search text-white/40"></i>
+          <span>Search modules, specs, models...</span>
+        </span>
+        <kbd class="bg-white/10 text-white/70 text-[10px] px-1.5 py-0.5 rounded font-mono">Ctrl+K</kbd>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <button onclick="showView('agents')" class="hidden sm:flex items-center space-x-2 bg-[#121212] border border-[#C5A059]/30 px-3 py-1 rounded-full text-xs hover:border-[#C5A059] transition-colors">
+          <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+          <span class="text-white/80 font-mono text-[11px]"><strong class="text-[#C5A059]">6</strong> SWARM AGENTS ACTIVE</span>
+        </button>
+
+        <button onclick="showView('notifications')" class="relative text-white/70 hover:text-white text-lg p-1.5">
+          <i class="bi bi-bell"></i>
+          <span class="absolute top-1 right-1 w-2 h-2 bg-[#C5A059] rounded-full ring-2 ring-[#0D0D0D]"></span>
+        </button>
+
+        <div class="relative group flex items-center space-x-2">
+          <!-- Logged In User State -->
+          <div id="user-logged-in-box" class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 bg-[#121212] border border-white/10 rounded-full pl-2 pr-3 py-1 hover:border-white/30 transition-colors cursor-pointer" onclick="showView('settings')">
+              <div id="user-avatar-badge" class="w-7 h-7 rounded-full bg-[#C5A059] text-[#0D0D0D] font-bold text-xs flex items-center justify-center uppercase">
+                AV
+              </div>
+              <div class="text-left hidden sm:block">
+                <span id="user-display-name" class="text-xs font-semibold text-white block leading-tight">Alexandra Vance</span>
+                <span id="user-display-email" class="text-[10px] text-[#C5A059] font-mono block leading-tight">lalantaaplog@gmail.com</span>
+              </div>
+            </div>
+
+            <button id="btn-header-logout" onclick="handleLogout()" class="bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500 hover:text-white px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center space-x-1.5" title="Log out from session">
+              <i class="bi bi-box-arrow-right"></i>
+              <span class="hidden md:inline">Logout</span>
+            </button>
+          </div>
+
+          <!-- Logged Out Quick Actions -->
+          <div id="user-logged-out-box" class="hidden flex items-center space-x-2">
+            <button onclick="showView('login')" class="text-xs font-semibold text-white/80 hover:text-white px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/30">
+              Sign In
+            </button>
+            <button onclick="showView('signup')" class="text-xs font-semibold bg-[#C5A059] text-[#0D0D0D] px-3.5 py-1.5 rounded-lg hover:bg-[#d8b46d] transition-colors">
+              Sign Up
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Layout -->
+    <div class="flex-1 flex overflow-hidden">
+      <!-- Sidebar -->
+      <aside id="app-sidebar" class="w-64 bg-[#0A0A0A] border-r border-white/10 flex flex-col fixed lg:static inset-y-0 left-0 z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-[#C5A059] glow-gold"></span>
+            <span class="text-xs font-semibold uppercase tracking-wider text-white">Active Workspace</span>
+          </div>
+          <span class="text-[10px] font-mono text-[#C5A059] bg-[#C5A059]/10 px-2 py-0.5 rounded border border-[#C5A059]/30">Django 5.0</span>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4 px-2 space-y-1 text-xs">
+          <div class="px-3 py-1 text-[10px] uppercase tracking-wider font-mono text-white/30 font-semibold">Core Lifecycle</div>
+
+          <button onclick="showView('dashboard')" data-view="dashboard" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]">
+            <i class="bi bi-grid-1x2-fill text-sm"></i>
+            <span class="font-medium">Overview Dashboard</span>
+          </button>
+
+          <button onclick="showView('projects')" data-view="projects" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-folder2-open text-sm"></i>
+            <span class="font-medium">Project Workspace</span>
+          </button>
+
+          <button onclick="showView('requirements')" data-view="requirements" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-card-checklist text-sm"></i>
+            <span class="font-medium">AI Requirement Analyzer</span>
+          </button>
+
+          <button onclick="showView('architecture')" data-view="architecture" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-diagram-3-fill text-sm"></i>
+            <span class="font-medium">Architecture Topology</span>
+          </button>
+
+          <button onclick="showView('database')" data-view="database" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-database-fill text-sm"></i>
+            <span class="font-medium">Database & ORM Designer</span>
+          </button>
+
+          <div class="px-3 pt-4 pb-1 text-[10px] uppercase tracking-wider font-mono text-white/30 font-semibold">AI Intelligence & Code</div>
+
+          <button onclick="showView('agents')" data-view="agents" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-cpu-fill text-sm text-[#C5A059]"></i>
+            <span class="font-medium">AI Agent Swarm</span>
+          </button>
+
+          <button onclick="showView('code')" data-view="code" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-code-slash text-sm"></i>
+            <span class="font-medium">Code Studio</span>
+          </button>
+
+          <button onclick="showView('quality')" data-view="quality" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-shield-check text-sm"></i>
+            <span class="font-medium">Quality & Security Docs</span>
+          </button>
+
+          <button onclick="showView('tasks')" data-view="tasks" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-kanban-fill text-sm"></i>
+            <span class="font-medium">Sprint & Task Board</span>
+          </button>
+
+          <div class="px-3 pt-4 pb-1 text-[10px] uppercase tracking-wider font-mono text-white/30 font-semibold">DevOps & Telemetry</div>
+
+          <button onclick="showView('analytics')" data-view="analytics" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-bar-chart-line-fill text-sm"></i>
+            <span class="font-medium">Telemetry & Analytics</span>
+          </button>
+
+          <button onclick="showView('cicd')" data-view="cicd" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-rocket-takeoff-fill text-sm"></i>
+            <span class="font-medium">CI/CD Pipeline Engine</span>
+          </button>
+
+          <button onclick="showView('notifications')" data-view="notifications" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-bell-fill text-sm"></i>
+            <span class="font-medium">Notifications Feed</span>
+          </button>
+
+          <button onclick="showView('settings')" data-view="settings" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-gear-fill text-sm"></i>
+            <span class="font-medium">System Settings</span>
+          </button>
+
+          <button onclick="showView('showcase')" data-view="showcase" class="w-full text-left flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 border-transparent">
+            <i class="bi bi-joystick text-sm text-[#C5A059]"></i>
+            <span class="font-medium text-[#C5A059]">Order Engine Sandbox</span>
+          </button>
+        </nav>
+
+        <div class="p-4 border-t border-white/10 bg-[#080808]">
+          <div class="flex items-center space-x-2 text-[10px] font-mono text-white/40 mb-1">
+            <i class="bi bi-cpu text-[#C5A059]"></i>
+            <span>GEMINI 3.6 FLASH</span>
+          </div>
+          <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+            <div class="bg-[#C5A059] h-full w-4/5 rounded-full"></div>
+          </div>
+          <div class="text-[9px] text-white/30 font-mono mt-1 text-right">Quota 80% Idle</div>
+        </div>
+      </aside>
+
+      <!-- Main Container View Pages -->
+      <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        
+        <!-- Contextual Topbar -->
+        <div class="bg-[#0D0D0D] border-b border-white/10 px-6 py-3 flex items-center justify-between">
+          <div class="flex items-center space-x-3 text-xs font-mono">
+            <span class="text-white/40">PROJECTS</span>
+            <span class="text-white/20">/</span>
+            <span class="text-[#C5A059] font-semibold">Nexus-Core Matching Engine</span>
+            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 uppercase">ACTIVE</span>
+          </div>
+
+          <div class="flex items-center space-x-3 text-xs">
+            <button id="btn-trigger-swarm" class="bg-[#C5A059]/10 border border-[#C5A059]/40 hover:bg-[#C5A059] hover:text-[#0D0D0D] text-[#C5A059] px-3 py-1.5 rounded-lg font-medium transition-all flex items-center space-x-2">
+              <i class="bi bi-play-fill"></i>
+              <span>Execute Agent Swarm Sequence</span>
+            </button>
+          </div>
+        </div>
+
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+          
+          <!-- VIEW 1: Dashboard -->
+          <div id="view-dashboard" class="view-page space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-[#121212] via-[#161616] to-[#121212] p-6 rounded-2xl border border-white/10 relative overflow-hidden">
+              <div class="space-y-1 z-10">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs font-mono text-[#C5A059] uppercase tracking-wider">PLATFORM TELEMETRY</span>
+                  <span class="text-white/20">•</span>
+                  <span class="text-xs font-mono text-emerald-400">DJANGO 5.0 ENGINE</span>
+                </div>
+                <h1 class="text-2xl font-serif text-white font-bold tracking-tight">Software Engineering Command Center</h1>
+                <p class="text-xs text-white/60 max-w-xl">Autonomous multi-agent orchestration for end-to-end software specifications, system topology, C++ & Python code generation, and OWASP security validation.</p>
+              </div>
+
+              <div class="flex items-center space-x-3 z-10">
+                <button onclick="showView('requirements')" class="bg-[#C5A059] text-[#0D0D0D] font-semibold text-xs px-4 py-2.5 rounded-lg hover:bg-[#d8b46d] transition-colors flex items-center space-x-2 shadow-lg">
+                  <i class="bi bi-plus-lg"></i>
+                  <span>New AI Requirement Spec</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div class="nexus-card p-4 space-y-2">
+                <div class="flex items-center justify-between text-white/50 text-xs font-mono">
+                  <span>PROJECTS</span>
+                  <i class="bi bi-folder2 text-[#C5A059]"></i>
+                </div>
+                <div class="text-2xl font-serif font-bold text-white">2</div>
+                <div class="text-[10px] text-emerald-400 font-mono"><i class="bi bi-arrow-up-right"></i> Nexus-Core Engine</div>
+              </div>
+
+              <div class="nexus-card p-4 space-y-2">
+                <div class="flex items-center justify-between text-white/50 text-xs font-mono">
+                  <span>SWARM AGENTS</span>
+                  <i class="bi bi-cpu text-[#C5A059]"></i>
+                </div>
+                <div class="text-2xl font-serif font-bold text-[#C5A059]">6</div>
+                <div class="text-[10px] text-white/40 font-mono">100% Sync Accuracy</div>
+              </div>
+
+              <div class="nexus-card p-4 space-y-2">
+                <div class="flex items-center justify-between text-white/50 text-xs font-mono">
+                  <span>EXTRACTED SPECS</span>
+                  <i class="bi bi-card-checklist text-[#C5A059]"></i>
+                </div>
+                <div class="text-2xl font-serif font-bold text-white">3</div>
+                <div class="text-[10px] text-white/40 font-mono">3 Approved PRD items</div>
+              </div>
+
+              <div class="nexus-card p-4 space-y-2">
+                <div class="flex items-center justify-between text-white/50 text-xs font-mono">
+                  <span>TOPOLOGY NODES</span>
+                  <i class="bi bi-diagram-3 text-[#C5A059]"></i>
+                </div>
+                <div class="text-2xl font-serif font-bold text-white">5</div>
+                <div class="text-[10px] text-emerald-400 font-mono">Avg Latency 0.8ms</div>
+              </div>
+
+              <div class="nexus-card p-4 space-y-2">
+                <div class="flex items-center justify-between text-white/50 text-xs font-mono">
+                  <span>SECURITY AUDIT</span>
+                  <i class="bi bi-shield-check text-[#10B981]"></i>
+                </div>
+                <div class="text-2xl font-serif font-bold text-[#10B981]">98.5%</div>
+                <div class="text-[10px] text-emerald-400 font-mono">OWASP Top 10 Compliant</div>
+              </div>
+            </div>
+
+            <div class="nexus-card-gold p-6 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2 h-2 rounded-full bg-[#C5A059] animate-pulse"></span>
+                  <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Software Development Lifecycle Pipeline</h3>
+                </div>
+                <span class="text-xs font-mono text-[#C5A059]">STAGE 5 / 8 — CODE GENERATION & REFACTORING</span>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center text-xs font-mono">
+                <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">1. Idea</div>
+                <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">2. Specs</div>
+                <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">3. Architecture</div>
+                <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">4. Database</div>
+                <div class="p-2.5 rounded-lg bg-[#C5A059]/20 border border-[#C5A059] text-[#C5A059] font-bold shadow-md">5. Code</div>
+                <div class="p-2.5 rounded-lg bg-white/5 border border-white/10 text-white/50">6. Testing</div>
+                <div class="p-2.5 rounded-lg bg-white/5 border border-white/10 text-white/50">7. Review</div>
+                <div class="p-2.5 rounded-lg bg-white/5 border border-white/10 text-white/50">8. Docs</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 2: Projects -->
+          <div id="view-projects" class="view-page hidden space-y-6">
+            <div class="flex items-center justify-between">
+              <h1 class="text-xl font-serif text-white font-bold">Project Workspace Repository</h1>
+              <button onclick="document.getElementById('create-project-modal').classList.remove('hidden')" class="bg-[#C5A059] text-[#0D0D0D] font-bold text-xs px-4 py-2.5 rounded-lg">Create Project</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="nexus-card p-6 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono text-[#C5A059]">FINTECH ENGINE</span>
+                  <span class="text-xs text-emerald-400 font-mono">ACTIVE</span>
+                </div>
+                <h3 class="text-base font-bold text-white">Nexus-Core Matching Engine</h3>
+                <p class="text-xs text-white/60">High-frequency order book matching service with microsecond latency and Redis RESP event streams.</p>
+              </div>
+              <div class="nexus-card p-6 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono text-[#C5A059]">AI INFRASTRUCTURE</span>
+                  <span class="text-xs text-amber-400 font-mono">PLANNING</span>
+                </div>
+                <h3 class="text-base font-bold text-white">Autonomous Spec Generator</h3>
+                <p class="text-xs text-white/60">AI multi-agent orchestration service that extracts PRDs and builds architecture topologies.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 3: Requirements -->
+          <div id="view-requirements" class="view-page hidden space-y-6">
+            <div class="nexus-card-gold p-6 space-y-4">
+              <h3 class="text-xs font-mono font-bold text-[#C5A059]">GEMINI 3.6 FLASH REQUIREMENT ENGINE</h3>
+              <textarea id="ai-raw-prompt" rows="3" placeholder="Enter natural language project prompt..." class="w-full bg-[#0D0D0D] border border-white/10 rounded-xl p-3 text-xs text-white outline-none"></textarea>
+              <button id="btn-analyze-reqs" class="bg-[#C5A059] text-[#0D0D0D] font-bold text-xs px-4 py-2.5 rounded-lg">Analyze & Extract Specs with Gemini</button>
+            </div>
+            <div id="reqs-results-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="nexus-card p-4 space-y-2">
+                <div class="flex justify-between text-xs font-mono"><span class="text-white font-bold">Sub-Millisecond Order Depth Sync</span><span class="text-rose-400">HIGH</span></div>
+                <p class="text-xs text-white/60">Maintain double-ended order queues with microsecond time-priority execution.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 4: Architecture -->
+          <div id="view-architecture" class="view-page hidden space-y-6">
+            <div class="nexus-card-gold p-6">
+              <h3 class="text-xs font-mono font-bold text-[#C5A059] mb-4">SYSTEM ARCHITECTURE TOPOLOGY CANVAS</h3>
+              <svg class="w-full h-[300px]" viewBox="0 0 600 300">
+                <line x1="120" y1="150" x2="280" y2="80" stroke="#C5A059" stroke-width="2" />
+                <line x1="120" y1="150" x2="280" y2="220" stroke="#C5A059" stroke-width="2" />
+                <line x1="280" y1="220" x2="480" y2="100" stroke="#10B981" stroke-width="2" />
+                <rect x="50" y="120" width="120" height="60" rx="10" fill="#121212" stroke="#C5A059" stroke-width="2" />
+                <text x="110" y="155" fill="#FFF" font-size="11" font-weight="bold" text-anchor="middle">API Gateway</text>
+                <rect x="240" y="50" width="120" height="60" rx="10" fill="#121212" stroke="#3B82F6" stroke-width="2" />
+                <text x="300" y="85" fill="#FFF" font-size="11" font-weight="bold" text-anchor="middle">Auth Service</text>
+                <rect x="240" y="190" width="130" height="60" rx="10" fill="#161616" stroke="#C5A059" stroke-width="2.5" />
+                <text x="305" y="225" fill="#C5A059" font-size="11" font-weight="bold" text-anchor="middle">Django 5 Engine</text>
+                <rect x="440" y="70" width="120" height="60" rx="10" fill="#121212" stroke="#10B981" stroke-width="2" />
+                <text x="500" y="105" fill="#FFF" font-size="11" font-weight="bold" text-anchor="middle">PostgreSQL</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- VIEW 5: Database -->
+          <div id="view-database" class="view-page hidden space-y-6">
+            <!-- Excel Database Live Inspector -->
+            <div class="nexus-card-gold p-6 space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg">
+                    <i class="bi bi-file-earmark-excel-fill"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2">
+                      <span>users.xlsx Excel Sheet Database</span>
+                      <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 uppercase font-sans">LIVE EXCEL PERSISTENCE</span>
+                    </h3>
+                    <p class="text-xs text-white/60">Signup credentials (Gmail, Name, Password, Timestamp) are directly stored and retrieved from this Excel spreadsheet.</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                  <button onclick="refreshExcelUsersTable()" class="bg-[#121212] border border-white/20 hover:border-white/40 text-white text-xs px-3 py-2 rounded-lg flex items-center space-x-1.5 transition-colors">
+                    <i class="bi bi-arrow-clockwise text-[#C5A059]"></i>
+                    <span>Refresh</span>
+                  </button>
+                  <a href="/api/auth/download-excel" target="_blank" download class="bg-[#C5A059] text-[#0D0D0D] hover:bg-[#d8b46d] font-bold text-xs px-3.5 py-2 rounded-lg flex items-center space-x-1.5 shadow-lg transition-all">
+                    <i class="bi bi-download"></i>
+                    <span>Download users.xlsx</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Live Excel Table -->
+              <div class="overflow-x-auto rounded-xl border border-white/10 bg-[#080808]">
+                <table class="w-full text-left text-xs text-white/80 font-mono">
+                  <thead class="bg-[#121212] text-white/50 uppercase text-[10px] tracking-wider border-b border-white/10">
+                    <tr>
+                      <th class="py-3 px-4">#</th>
+                      <th class="py-3 px-4">Full Name</th>
+                      <th class="py-3 px-4">Gmail / Email</th>
+                      <th class="py-3 px-4">Password</th>
+                      <th class="py-3 px-4">Role</th>
+                      <th class="py-3 px-4">Signed Up At</th>
+                    </tr>
+                  </thead>
+                  <tbody id="excel-users-tbody" class="divide-y divide-white/5">
+                    <tr>
+                      <td colspan="6" class="py-6 text-center text-white/40 italic">Loading records from users.xlsx...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- PostgreSQL ORM Card -->
+            <div class="nexus-card p-6 space-y-4">
+              <h3 class="text-sm font-semibold text-white font-mono">orders (PostgreSQL Table Schema)</h3>
+              <pre class="terminal-box p-4 text-xs"><code>from django.db import models
+
+class Order(models.Model):
+    id = models.UUIDField(primary_key=True)
+    symbol = models.CharField(max_length=20)
+    side = models.CharField(max_length=4)
+    price = models.DecimalField(max_digits=18, decimal_places=8)
+    quantity = models.DecimalField(max_digits=18, decimal_places=8)</code></pre>
+            </div>
+          </div>
+
+          <!-- VIEW 6: Agents -->
+          <div id="view-agents" class="view-page hidden space-y-6">
+            <div class="flex items-center justify-between">
+              <h1 class="text-xl font-serif text-white font-bold">AI Multi-Agent Swarm Command Center</h1>
+              <button id="btn-trigger-swarm" class="bg-[#C5A059] text-[#0D0D0D] font-bold text-xs px-4 py-2.5 rounded-lg">Execute Agent Swarm</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="nexus-card p-4 space-y-2"><div class="text-xs font-bold text-white">Spec Analyst Agent</div><div class="text-[10px] text-[#C5A059] font-mono">142 Tasks | 99.6% Accuracy</div></div>
+              <div class="nexus-card p-4 space-y-2"><div class="text-xs font-bold text-white">Architect Agent</div><div class="text-[10px] text-[#C5A059] font-mono">98 Tasks | 99.2% Accuracy</div></div>
+              <div class="nexus-card p-4 space-y-2"><div class="text-xs font-bold text-white">Code Generator Agent</div><div class="text-[10px] text-[#C5A059] font-mono">230 Tasks | 98.9% Accuracy</div></div>
+            </div>
+            <div id="swarm-terminal-logs" class="terminal-box p-4 h-36 overflow-y-auto text-xs">
+              <div class="text-[#C5A059]">[08:35:00] Swarm Bus listening...</div>
+            </div>
+          </div>
+
+          <!-- VIEW 7: Code Studio -->
+          <div id="view-code" class="view-page hidden space-y-6">
+            <div class="nexus-card-gold p-4 space-y-2">
+              <div class="flex justify-between text-xs font-mono text-white/60"><span>nexus_project/settings.py</span><button id="btn-review-code" class="text-[#C5A059]"><i class="bi bi-magic mr-1"></i>Refactor Code</button></div>
+              <textarea id="code-editor-textarea" rows="10" class="w-full bg-[#080808] border border-white/10 rounded-xl p-3 text-xs font-mono text-emerald-400 outline-none"># Django Settings Configuration
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'nexusai_app',
+]</textarea>
+            </div>
+            <div class="nexus-card p-4">
+              <ul id="code-findings-output" class="text-xs space-y-1">
+                <li class="text-emerald-400"><i class="bi bi-check2 mr-1"></i> PostgreSQL connection parameters validated.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- VIEW 8: Quality Docs -->
+          <div id="view-quality" class="view-page hidden space-y-6">
+            <div class="nexus-card p-6 space-y-3">
+              <h3 class="text-sm font-bold text-white">Pytest Unit Test Suite (24/24 Passed)</h3>
+              <div class="text-xs text-emerald-400 font-mono">Coverage: 99.4%</div>
+            </div>
+          </div>
+
+          <!-- VIEW 9: Sprint Tasks -->
+          <div id="view-tasks" class="view-page hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div class="nexus-card p-4 font-mono text-xs"><div class="text-rose-400 font-bold mb-2">BACKLOG</div><div>Refactor C++ Order Book Bindings</div></div>
+              <div class="nexus-card-gold p-4 font-mono text-xs"><div class="text-[#C5A059] font-bold mb-2">IN PROGRESS</div><div>Optimize Redis RESP Stream Latency</div></div>
+              <div class="nexus-card p-4 font-mono text-xs"><div class="text-sky-400 font-bold mb-2">CODE REVIEW</div><div>JWT Bearer Auth Enforcement</div></div>
+              <div class="nexus-card p-4 font-mono text-xs"><div class="text-emerald-400 font-bold mb-2">COMPLETED</div><div>OWASP Top 10 Security Scan</div></div>
+            </div>
+          </div>
+
+          <!-- VIEW 10: Analytics -->
+          <div id="view-analytics" class="view-page hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="nexus-card-gold p-6 space-y-2">
+                <h3 class="text-xs font-mono font-bold text-white">Order Throughput (QPS)</h3>
+                <canvas id="chart-qps" class="w-full h-48"></canvas>
+              </div>
+              <div class="nexus-card p-6 space-y-2">
+                <h3 class="text-xs font-mono font-bold text-white">Gemini Token Usage (k)</h3>
+                <canvas id="chart-tokens" class="w-full h-48"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 11: CI/CD -->
+          <div id="view-cicd" class="view-page hidden space-y-6">
+            <div class="nexus-card p-6 space-y-2">
+              <h3 class="text-sm font-bold text-white font-mono">Main Production Deploy (38s) — Success</h3>
+            </div>
+          </div>
+
+          <!-- VIEW 12: Notifications -->
+          <div id="view-notifications" class="view-page hidden space-y-6">
+            <div class="nexus-card p-4 text-xs font-mono text-white/80">Agent Swarm Cycle Executed — Swarm completed code refactoring and architecture latency pass.</div>
+          </div>
+
+          <!-- VIEW 13: Settings -->
+          <div id="view-settings" class="view-page hidden space-y-6">
+            <div class="nexus-card p-6 space-y-4">
+              <h3 class="text-sm font-bold text-white uppercase">System Configuration</h3>
+              <a href="/api/export/django" target="_blank" class="inline-block bg-[#C5A059] text-[#0D0D0D] font-bold text-xs px-4 py-2.5 rounded-lg">Export Django Project JSON</a>
+            </div>
+          </div>
+
+          <!-- VIEW 14: Showcase Sandbox -->
+          <div id="view-showcase" class="view-page hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="nexus-card-gold p-6 space-y-3">
+                <h3 class="text-xs font-mono font-bold text-white">Submit Limit Order</h3>
+                <form id="order-submit-form" class="space-y-3 text-xs">
+                  <input type="text" id="order-symbol" value="BTC-USD" class="w-full bg-[#0D0D0D] border border-white/10 rounded p-2 text-white">
+                  <select id="order-side" class="w-full bg-[#0D0D0D] border border-white/10 rounded p-2 text-emerald-400 font-bold"><option value="BUY">BUY</option><option value="SELL">SELL</option></select>
+                  <input type="number" id="order-price" value="68500.00" class="w-full bg-[#0D0D0D] border border-white/10 rounded p-2 text-white">
+                  <input type="number" id="order-qty" value="0.5" class="w-full bg-[#0D0D0D] border border-white/10 rounded p-2 text-white">
+                  <button type="submit" class="w-full bg-[#C5A059] text-[#0D0D0D] font-bold py-2.5 rounded">Submit Order</button>
+                </form>
+              </div>
+              <div class="md:col-span-2 nexus-card p-6">
+                <h3 class="text-xs font-mono font-bold text-white mb-3">Matched Order Book Stream</h3>
+                <div id="order-book-ledger" class="space-y-1 text-xs font-mono">
+                  <div class="flex justify-between text-white/70"><span>08:35:10</span><span>BTC-USD</span><span class="text-emerald-400 font-bold">BUY</span><span>$68,500.00</span><span>0.50</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 15: Sign In (Authentication via users.xlsx) -->
+          <div id="view-login" class="view-page hidden py-8">
+            <div class="max-w-md mx-auto bg-[#121212] border border-white/20 rounded-2xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
+              <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-xl bg-[#C5A059]/10 border border-[#C5A059]/40 flex items-center justify-center text-[#C5A059] mx-auto text-2xl font-bold">
+                  <i class="bi bi-person-lock"></i>
+                </div>
+                <h1 class="text-2xl font-serif text-white font-bold tracking-tight">Sign In to <span class="text-[#C5A059]">NexusAI</span></h1>
+                <p class="text-xs text-white/50">Enter credentials to authenticate against <code class="text-[#C5A059] font-mono">users.xlsx</code> Excel database.</p>
+              </div>
+
+              <!-- Excel Database Notice -->
+              <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[11px] text-emerald-400 flex items-start space-x-2.5">
+                <i class="bi bi-file-earmark-excel-fill text-base mt-0.5"></i>
+                <div>
+                  <strong class="font-bold block">Excel Sheet Authentication Active</strong>
+                  Login verifies your Gmail and Password directly from <span class="underline">users.xlsx</span> spreadsheet on server.
+                </div>
+              </div>
+
+              <form id="auth-login-form" class="space-y-4 text-xs">
+                <div class="space-y-1">
+                  <label class="text-white/70 font-semibold uppercase text-[10px] tracking-wider">Gmail / Email Address</label>
+                  <div class="relative">
+                    <i class="bi bi-envelope text-white/40 absolute left-3 top-3 text-sm"></i>
+                    <input type="email" id="login-email" required placeholder="lalantaaplog@gmail.com" value="lalantaaplog@gmail.com" class="w-full bg-[#080808] border border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-white outline-none focus:border-[#C5A059]">
+                  </div>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="text-white/70 font-semibold uppercase text-[10px] tracking-wider">Password</label>
+                  <div class="relative">
+                    <i class="bi bi-key text-white/40 absolute left-3 top-3 text-sm"></i>
+                    <input type="password" id="login-password" required placeholder="••••••••" value="Password123!" class="w-full bg-[#080808] border border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-white outline-none focus:border-[#C5A059]">
+                  </div>
+                </div>
+
+                <button type="submit" id="btn-login-submit" class="w-full bg-[#C5A059] text-[#0D0D0D] font-bold py-3 rounded-xl hover:bg-[#d8b46d] transition-all shadow-lg text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
+                  <i class="bi bi-box-arrow-in-right text-base"></i>
+                  <span>Sign In</span>
+                </button>
+              </form>
+
+              <div class="text-center text-xs text-white/40 pt-3 border-t border-white/10">
+                Don't have an account? <button onclick="showView('signup')" class="text-[#C5A059] hover:underline font-semibold ml-1">Register & Save to Excel</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 16: Sign Up (Registration stored in users.xlsx) -->
+          <div id="view-signup" class="view-page hidden py-8">
+            <div class="max-w-md mx-auto bg-[#121212] border border-white/20 rounded-2xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
+              <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-xl bg-[#C5A059]/10 border border-[#C5A059]/40 flex items-center justify-center text-[#C5A059] mx-auto text-2xl font-bold">
+                  <i class="bi bi-person-plus-fill"></i>
+                </div>
+                <h1 class="text-2xl font-serif text-white font-bold tracking-tight">Create Account in <span class="text-[#C5A059]">NexusAI</span></h1>
+                <p class="text-xs text-white/50">Details will be stored instantly in <code class="text-[#C5A059] font-mono">users.xlsx</code> Excel spreadsheet.</p>
+              </div>
+
+              <!-- Excel Save Notice -->
+              <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[11px] text-emerald-400 flex items-start space-x-2.5">
+                <i class="bi bi-file-earmark-spreadsheet-fill text-base mt-0.5"></i>
+                <div>
+                  <strong class="font-bold block">Excel Persistence Notice</strong>
+                  Your Name, Gmail, Password, Role, and Timestamp will be appended as a new row in <span class="underline">users.xlsx</span>.
+                </div>
+              </div>
+
+              <form id="auth-signup-form" class="space-y-4 text-xs">
+                <div class="space-y-1">
+                  <label class="text-white/70 font-semibold uppercase text-[10px] tracking-wider">Full Name</label>
+                  <div class="relative">
+                    <i class="bi bi-person text-white/40 absolute left-3 top-3 text-sm"></i>
+                    <input type="text" id="signup-name" required placeholder="e.g. Alexandra Vance" class="w-full bg-[#080808] border border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-white outline-none focus:border-[#C5A059]">
+                  </div>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="text-white/70 font-semibold uppercase text-[10px] tracking-wider">Gmail / Email Address</label>
+                  <div class="relative">
+                    <i class="bi bi-envelope text-white/40 absolute left-3 top-3 text-sm"></i>
+                    <input type="email" id="signup-email" required placeholder="e.g. user@gmail.com" class="w-full bg-[#080808] border border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-white outline-none focus:border-[#C5A059]">
+                  </div>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="text-white/70 font-semibold uppercase text-[10px] tracking-wider">Password</label>
+                  <div class="relative">
+                    <i class="bi bi-key text-white/40 absolute left-3 top-3 text-sm"></i>
+                    <input type="password" id="signup-password" required placeholder="Choose a strong password" class="w-full bg-[#080808] border border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-white outline-none focus:border-[#C5A059]">
+                  </div>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="text-white/70 font-semibold uppercase text-[10px] tracking-wider">System Role / Designation</label>
+                  <select id="signup-role" class="w-full bg-[#080808] border border-white/10 rounded-xl px-3 py-2.5 text-white outline-none focus:border-[#C5A059]">
+                    <option value="System Architect">System Architect</option>
+                    <option value="Lead Software Engineer">Lead Software Engineer</option>
+                    <option value="DevOps & Security Specialist">DevOps & Security Specialist</option>
+                    <option value="Product Owner">Product Owner</option>
+                  </select>
+                </div>
+
+                <button type="submit" id="btn-signup-submit" class="w-full bg-[#C5A059] text-[#0D0D0D] font-bold py-3 rounded-xl hover:bg-[#d8b46d] transition-all shadow-lg text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
+                  <i class="bi bi-file-earmark-plus text-base"></i>
+                  <span>Sign Up & Store in Excel</span>
+                </button>
+              </form>
+
+              <div class="text-center text-xs text-white/40 pt-3 border-t border-white/10">
+                Already have an account? <button onclick="showView('login')" class="text-[#C5A059] hover:underline font-semibold ml-1">Log in here</button>
+              </div>
+            </div>
+          </div>
+
+        </main>
+
+        <footer class="border-t border-white/10 bg-[#0A0A0A] py-6 px-8 mt-auto">
+          <div class="max-w-7xl mx-auto flex items-center justify-between text-[10px] font-mono text-white/40">
+            <div>NEXUSAI WORKSPACE — AUTONOMOUS SOFTWARE ENGINEERING PLATFORM</div>
+            <div>POWERED BY DJANGO 5.0 & GEMINI 3.6 FLASH</div>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-3 pointer-events-none"></div>
+
+  <!-- Command Palette Modal -->
+  <div id="command-palette-modal" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start justify-center pt-20 hidden">
+    <div class="bg-[#121212] border border-white/20 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden p-4">
+      <input type="text" placeholder="Type a command or view name..." class="w-full bg-transparent text-sm text-white outline-none">
+    </div>
+  </div>
+
+  <script src="/static/js/main.js"></script>
+  <script src="/static/js/ai.js"></script>
+</body>
+</html>

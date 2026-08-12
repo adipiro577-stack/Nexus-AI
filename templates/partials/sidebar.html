@@ -1,0 +1,106 @@
+{% load static %}
+<aside id="app-sidebar" class="w-64 bg-[#0A0A0A] border-r border-white/10 flex flex-col fixed lg:static inset-y-0 left-0 z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  
+  <!-- Active Workspace Header -->
+  <div class="p-4 border-b border-white/10 flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <span class="w-2 h-2 rounded-full bg-[#C5A059] glow-gold"></span>
+      <span class="text-xs font-semibold uppercase tracking-wider text-white">Active Workspace</span>
+    </div>
+    <span class="text-[10px] font-mono text-[#C5A059] bg-[#C5A059]/10 px-2 py-0.5 rounded border border-[#C5A059]/30">Django 5.0</span>
+  </div>
+
+  <!-- Navigation Links list -->
+  <nav class="flex-1 overflow-y-auto py-4 px-2 space-y-1 text-xs">
+    
+    <div class="px-3 py-1 text-[10px] uppercase tracking-wider font-mono text-white/30 font-semibold">Core Lifecycle</div>
+
+    <a href="{% url 'dashboard' %}" data-view="dashboard" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'dashboard' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-grid-1x2-fill text-sm"></i>
+      <span class="font-medium">Overview Dashboard</span>
+    </a>
+
+    <a href="{% url 'projects' %}" data-view="projects" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'projects' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-folder2-open text-sm"></i>
+      <span class="font-medium">Project Workspace</span>
+    </a>
+
+    <a href="{% url 'requirements' %}" data-view="requirements" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'requirements' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-card-checklist text-sm"></i>
+      <span class="font-medium">AI Requirement Analyzer</span>
+    </a>
+
+    <a href="{% url 'architecture' %}" data-view="architecture" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'architecture' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-diagram-3-fill text-sm"></i>
+      <span class="font-medium">Architecture Topology</span>
+    </a>
+
+    <a href="{% url 'database' %}" data-view="database" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'database' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-database-fill text-sm"></i>
+      <span class="font-medium">Database & ORM Designer</span>
+    </a>
+
+    <div class="px-3 pt-4 pb-1 text-[10px] uppercase tracking-wider font-mono text-white/30 font-semibold">AI Intelligence & Code</div>
+
+    <a href="{% url 'agents' %}" data-view="agents" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'agents' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-[#C5A059] bi-cpu-fill text-sm text-[#C5A059]"></i>
+      <span class="font-medium">AI Agent Swarm</span>
+    </a>
+
+    <a href="{% url 'code' %}" data-view="code" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'code' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-code-slash text-sm"></i>
+      <span class="font-medium">Code Studio</span>
+    </a>
+
+    <a href="{% url 'quality' %}" data-view="quality" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'quality' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-shield-check text-sm"></i>
+      <span class="font-medium">Quality & Security Docs</span>
+    </a>
+
+    <a href="{% url 'tasks' %}" data-view="tasks" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'tasks' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-kanban-fill text-sm"></i>
+      <span class="font-medium">Sprint & Task Board</span>
+    </a>
+
+    <div class="px-3 pt-4 pb-1 text-[10px] uppercase tracking-wider font-mono text-white/30 font-semibold">DevOps & Telemetry</div>
+
+    <a href="{% url 'analytics' %}" data-view="analytics" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'analytics' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-bar-chart-line-fill text-sm"></i>
+      <span class="font-medium">Telemetry & Analytics</span>
+    </a>
+
+    <a href="{% url 'cicd' %}" data-view="cicd" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'cicd' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-rocket-takeoff-fill text-sm"></i>
+      <span class="font-medium">CI/CD Pipeline Engine</span>
+    </a>
+
+    <a href="{% url 'notifications' %}" data-view="notifications" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'notifications' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-bell-fill text-sm"></i>
+      <span class="font-medium">Notifications Feed</span>
+    </a>
+
+    <a href="{% url 'settings' %}" data-view="settings" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'settings' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-gear-fill text-sm"></i>
+      <span class="font-medium">System Settings</span>
+    </a>
+
+    <a href="{% url 'showcase' %}" data-view="showcase" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors border-l-2 {% if current_view == 'showcase' %}bg-[#1A1A1A] text-[#C5A059] border-[#C5A059]{% else %}border-transparent{% endif %}">
+      <i class="bi bi-joystick text-sm text-[#C5A059]"></i>
+      <span class="font-medium text-[#C5A059]">Order Engine Sandbox</span>
+    </a>
+
+  </nav>
+
+  <!-- Sidebar Footer Engine Indicator -->
+  <div class="p-4 border-t border-white/10 bg-[#080808]">
+    <div class="flex items-center space-x-2 text-[10px] font-mono text-white/40 mb-1">
+      <i class="bi bi-cpu text-[#C5A059]"></i>
+      <span>GEMINI 3.6 FLASH</span>
+    </div>
+    <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+      <div class="bg-[#C5A059] h-full w-4/5 rounded-full"></div>
+    </div>
+    <div class="text-[9px] text-white/30 font-mono mt-1 text-right">Quota 80% Idle</div>
+  </div>
+
+</aside>

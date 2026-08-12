@@ -1,0 +1,107 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div id="view-projects" class="view-page space-y-6">
+  
+  <!-- Header & Create Button -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-serif text-white font-bold tracking-tight">Project Workspace Repository</h1>
+      <p class="text-xs text-white/60">Manage all registered engineering software projects and target technology stacks.</p>
+    </div>
+
+    <button data-modal-target="create-project-modal" class="bg-[#C5A059] text-[#0D0D0D] font-semibold text-xs px-4 py-2.5 rounded-lg hover:bg-[#d8b46d] transition-colors flex items-center space-x-2 shadow-lg">
+      <i class="bi bi-folder-plus"></i>
+      <span>Create New Project</span>
+    </button>
+  </div>
+
+  <!-- Projects Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for proj in projects %}
+    <div class="nexus-card p-6 space-y-4 flex flex-col justify-between relative group hover:border-[#C5A059]/50 transition-all">
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-mono text-[#C5A059] bg-[#C5A059]/10 px-2.5 py-0.5 rounded border border-[#C5A059]/30 uppercase">{{ proj.category }}</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded uppercase {% if proj.status == 'active' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/30{% else %}bg-amber-500/10 text-amber-400 border border-amber-500/30{% endif %}">
+            {{ proj.status }}
+          </span>
+        </div>
+
+        <h3 class="text-base font-semibold text-white group-hover:text-[#C5A059] transition-colors">{{ proj.name }}</h3>
+        <p class="text-xs text-white/60 line-clamp-3 leading-relaxed">{{ proj.description }}</p>
+      </div>
+
+      <!-- Tech Stack Badges -->
+      <div class="space-y-3 pt-2">
+        <div class="flex flex-wrap gap-1.5">
+          {% for tech in proj.tech_stack %}
+          <span class="text-[10px] font-mono bg-white/5 border border-white/10 text-white/70 px-2 py-0.5 rounded">{{ tech }}</span>
+          {% endfor %}
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[10px] font-mono text-white/50">
+            <span>Progress</span>
+            <span class="text-[#C5A059] font-bold">{{ proj.progress }}%</span>
+          </div>
+          <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+            <div class="bg-[#C5A059] h-full rounded-full" style="width: {{ proj.progress }}%;"></div>
+          </div>
+        </div>
+
+        {% if proj.repo_url %}
+        <div class="pt-2 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+          <a href="{{ proj.repo_url }}" target="_blank" class="text-white/40 hover:text-white flex items-center space-x-1">
+            <i class="bi bi-github"></i>
+            <span>Repository</span>
+          </a>
+          <span class="text-white/30 text-[10px]">Updated {{ proj.updated_at|date:"M d" }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full p-8 text-center text-white/40 font-mono">No projects registered yet. Click Create New Project above.</div>
+    {% endfor %}
+  </div>
+
+</div>
+
+<!-- Create Project Modal -->
+<div id="create-project-modal" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-[#121212] border border-white/20 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <h3 class="text-base font-semibold text-white">Register New Project</h3>
+      <button data-modal-close class="text-white/40 hover:text-white text-lg"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <form method="POST" action="{% url 'projects' %}" class="space-y-4 text-xs">
+      {% csrf_token %}
+      <div class="space-y-1">
+        <label class="text-white/70 font-semibold uppercase">Project Name</label>
+        {{ form.name }}
+      </div>
+      <div class="space-y-1">
+        <label class="text-white/70 font-semibold uppercase">Category</label>
+        {{ form.category }}
+      </div>
+      <div class="space-y-1">
+        <label class="text-white/70 font-semibold uppercase">Description</label>
+        {{ form.description }}
+      </div>
+      <div class="space-y-1">
+        <label class="text-white/70 font-semibold uppercase">Repository URL</label>
+        {{ form.repo_url }}
+      </div>
+      
+      <div class="pt-2 flex justify-end space-x-3">
+        <button type="button" data-modal-close class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70">Cancel</button>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-[#C5A059] text-[#0D0D0D] font-semibold hover:bg-[#d8b46d]">Register Project</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
