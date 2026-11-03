@@ -1,0 +1,12 @@
+NexusAI Notifications Feed patch
+
+Files included: index.html, static/js/main.js, nexusai_app/models.py, nexusai_app/urls.py, nexusai_app/cicd_api.py, nexusai_app/notifications_api.py, migration 0009.
+
+Apply:
+1. Extract into F:\Projects\Nexus-AI preserving folders and allow replacement.
+2. In PowerShell at F:\Projects\Nexus-AI run:
+   .\.venv\Scripts\python.exe manage.py migrate
+3. Restart Django and Node servers, then press Ctrl+F5.
+
+This adds account-scoped notifications, mark-read and mark-all-read actions, and records a notification after each CI/CD validation. Existing notification records are left intact; old unassigned demo notifications are not exposed to normal user accounts.
+No database file or .env is included.

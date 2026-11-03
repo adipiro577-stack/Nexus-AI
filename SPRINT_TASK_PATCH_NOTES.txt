@@ -1,0 +1,11 @@
+NexusAI Sprint & Task Board patch
+Included:
+- index.html: replaces the old hard-coded sample cards with a live project task board and create/edit form.
+- static/js/main.js: loads tasks for the active workspace project; creates, edits, deletes tasks; updates status; shows live counts; displays assignee, sprint, priority and due date.
+- nexusai_app/tasks_api.py: authenticated owner-scoped GET/POST/PATCH/DELETE endpoints.
+- nexusai_app/models.py + migration 0005: adds sprint and due_date to TaskItem. Existing task rows are preserved; sprint defaults to Sprint 1 and due_date is nullable.
+Assignee is stored in the existing assigned_agent text field (enter a team member or agent name). This patch does not introduce a separate team-member foreign key because the current TeamMember model is global and not project-scoped in the supplied source.
+Apply to the project root, then run:
+  .\.venv\Scripts\python.exe manage.py migrate
+Restart Django and Node, then open a project workspace and Sprint & Task Board.
+No .env or database replacement is included.

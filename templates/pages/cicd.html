@@ -1,72 +1,41 @@
 {% extends 'base_dashboard.html' %}
 {% load static %}
-
 {% block content %}
 <div id="view-cicd" class="view-page space-y-6">
-  
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-    <div>
-      <h1 class="text-xl font-serif text-white font-bold tracking-tight">CI/CD Pipeline Engine & GitHub Actions Generator</h1>
-      <p class="text-xs text-white/60">Automated build, test, and Cloud Run container deployment workflows.</p>
-    </div>
-
-    <button data-copy="name: NexusAI Django CI/CD Pipeline
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Run Pytest & Linting
-        run: |
-          python manage.py test" class="bg-[#C5A059] text-[#0D0D0D] font-bold text-xs px-4 py-2.5 rounded-lg hover:bg-[#d8b46d] transition-all flex items-center space-x-2 shadow-lg">
-      <i class="bi bi-download"></i>
-      <span>Copy .github/workflows/main.yaml</span>
-    </button>
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div><h1 class="text-xl font-serif text-white font-bold">CI/CD Pipeline Engine</h1>
+      <p class="text-xs text-white/60 mt-1">Run project-linked local validation and inspect persisted pipeline history.</p></div>
+    <button id="cicd-copy-workflow" class="bg-[#C5A059] text-[#0D0D0D] font-bold text-xs px-4 py-2.5 rounded-lg">Copy GitHub Actions workflow</button>
   </div>
-
-  <!-- Pipelines List -->
-  <div class="space-y-4">
-    {% for pipe in pipelines %}
-    <div class="nexus-card p-6 space-y-3">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-            <i class="bi bi-rocket-takeoff-fill"></i>
-          </div>
-          <div>
-            <h3 class="text-sm font-semibold text-white font-mono">{{ pipe.name }}</h3>
-            <p class="text-xs text-white/50 font-mono">Branch: {{ pipe.branch }} | Triggered by {{ pipe.triggered_by }}</p>
-          </div>
-        </div>
-        <div class="text-right font-mono text-xs">
-          <span class="text-emerald-400 font-bold uppercase bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/30">{{ pipe.status }}</span>
-          <div class="text-white/40 text-[10px] mt-1">Duration: {{ pipe.duration }}</div>
-        </div>
-      </div>
-
-      <!-- Pipeline Step Logs -->
-      <div class="terminal-box p-3 text-xs space-y-1">
-        {% for log in pipe.logs %}
-        <div class="text-emerald-400/80">{{ log }}</div>
-        {% endfor %}
-      </div>
+  <section class="nexus-card p-5 space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <label class="text-xs text-white/60">Select project
+        <select id="cicd-project" class="mt-2 w-full bg-[#171717] border border-white/15 rounded-lg p-3 text-white">
+          <option value="">Choose a project</option>
+          {% for project in projects %}<option value="{{ project.id }}">{{ project.name|escape }}</option>{% endfor %}
+        </select>
+      </label>
+      <label class="text-xs text-white/60">Branch
+        <input id="cicd-branch" value="local" class="mt-2 w-full bg-[#171717] border border-white/15 rounded-lg p-3 text-white" readonly>
+      </label>
+      <div class="flex items-end"><button id="btn-run-pipeline" class="w-full bg-[#C5A059] text-black font-bold rounded-lg p-3">Run Pipeline</button></div>
     </div>
-    {% empty %}
-    <div class="nexus-card p-6 text-center text-xs font-mono text-white/40">Main Production Deploy (38s) — Success</div>
-    {% endfor %}
-  </div>
-
+    <p class="text-[11px] text-white/45">Local validation runs against the NexusAI Django backend. It does not execute code from the project's repository URL or deploy to a cloud host.</p>
+    <div class="flex flex-wrap gap-3 text-xs">
+      <span class="rounded bg-white/5 px-3 py-2 text-white/70">Source Validation: <b id="pipeline-source">Pending</b></span>
+      <span class="rounded bg-white/5 px-3 py-2 text-white/70">Django Check: <b id="pipeline-checks">Pending</b></span>
+      <span class="rounded bg-white/5 px-3 py-2 text-white/70">Automated Tests: <b id="pipeline-tests">Pending</b></span>
+    </div>
+    <div class="text-xs text-white/60" id="pipeline-status" aria-live="polite">Select a project to begin.</div>
+    <div class="text-xs font-semibold text-[#C5A059]" id="pipeline-readiness">Not run</div>
+    <pre id="pipeline-output" class="terminal-box p-4 text-xs text-emerald-300 whitespace-pre-wrap overflow-x-auto max-h-96">Pipeline logs will appear here.</pre>
+  </section>
+  <section class="space-y-3"><div class="flex items-center justify-between"><h2 class="text-sm font-semibold text-white">Project Pipeline History</h2><button id="cicd-refresh-history" class="text-xs text-[#C5A059]">Refresh history</button></div>
+    <div id="cicd-history" class="space-y-3"><div class="nexus-card p-4 text-xs text-white/40">Select a project to load its pipeline history.</div></div>
+  </section>
 </div>
+<script>
+window.NEXUS_CICD_WORKFLOW = `name: NexusAI CI\non:\n  push:\n    branches: [ main ]\n  pull_request:\n    branches: [ main ]\njobs:\n  validate:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n      - run: pip install -r requirements.txt\n      - run: python manage.py check\n      - run: python manage.py test nexusai_app`;
+</script>
+<script src="{% static 'js/cicd.js' %}"></script>
 {% endblock %}

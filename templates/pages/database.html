@@ -104,5 +104,55 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)</code></pre>
   </div>
 
+
+
+  <!-- Read-only registered account directory -->
+  <section class="nexus-card p-6 space-y-4 mt-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+      <div>
+        <h2 class="text-sm font-bold text-white">REGISTERED LOGIN ACCOUNTS</h2>
+        <p class="text-xs text-white/50 mt-1">
+          {% if account_directory_scope == 'all' %}
+            Read-only directory · Admin view · All registered accounts
+          {% else %}
+            Read-only account details · You can view only your own account
+          {% endif %}
+        </p>
+      </div>
+      <span class="text-xs text-[#C5A059]">{{ account_directory_count }} account{{ account_directory_count|pluralize }}</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-white/5 text-white/50 uppercase">
+          <tr>
+            <th class="p-3">Account ID</th>
+            <th class="p-3">Username</th>
+            <th class="p-3">Email</th>
+            <th class="p-3">Date Joined</th>
+            <th class="p-3">Last Login</th>
+            <th class="p-3">Role</th>
+            <th class="p-3">Projects</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5 text-white/80">
+          {% for account in account_directory %}
+          <tr class="hover:bg-white/5">
+            <td class="p-3 font-mono">{{ account.id }}</td>
+            <td class="p-3 font-semibold text-white">{{ account.username }}</td>
+            <td class="p-3">{{ account.email|default:'Not provided' }}</td>
+            <td class="p-3">{{ account.date_joined|date:'d M Y, H:i' }}</td>
+            <td class="p-3">{% if account.last_login %}{{ account.last_login|date:'d M Y, H:i' }}{% else %}Never{% endif %}</td>
+            <td class="p-3">{% if account.is_superuser %}Superuser{% elif account.is_staff %}Staff{% else %}User{% endif %}</td>
+            <td class="p-3">{{ account.project_count }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="p-4 text-center text-white/50">No account details available.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="text-[11px] text-white/40">Passwords and password hashes are never displayed. This page does not create, edit, or delete accounts.</p>
+  </section>
+
 </div>
 {% endblock %}

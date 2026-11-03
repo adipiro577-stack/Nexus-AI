@@ -1,0 +1,16 @@
+NexusAI Database & ORM Designer enhancement
+
+Files:
+- index.html: adds MySQL/PostgreSQL/SQLite target selector to the existing project-aware designer.
+- static/js/main.js: sends selected database engine with the existing projectId when generating.
+- server.ts: validates the engine and includes it in the AI schema-generation prompt and response.
+
+Existing behavior retained:
+- Requires an opened project.
+- Loads saved schema for the selected project.
+- Saves generated tables and Django ORM code through the existing Django API.
+- Preserves the existing database design persistence model.
+- Does not execute generated models or modify live database tables.
+
+Apply by extracting over F:\Projects\Nexus-AI. Do not replace .env or db.sqlite3.
+No migration is required for this patch.

@@ -1,0 +1,8 @@
+NexusAI Project Workspace Patch
+
+Replaces the workspace project loader with a resilient DRF response parser,
+owner-scoped live project count, search, status filter, refresh, and project cards.
+Adds an authenticated /api/projects/summary/ endpoint with account-scoped counts.
+Project create/update/delete continue using the existing authenticated Django API.
+
+No database schema or migration changes. Existing project records are preserved.

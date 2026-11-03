@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Verify Admin Access | NexusAI</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #0b0b0b; color: #f3f3f3; font-family: Inter, Segoe UI, Arial, sans-serif; }
+    .card { width: min(100%, 440px); padding: 32px; border: 1px solid #735a2e; border-radius: 18px; background: #141414; box-shadow: 0 18px 55px #0008; }
+    .eyebrow { color: #c5a059; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 12px 0; font-size: 25px; }
+    p { color: #b8b8b8; line-height: 1.55; font-size: 14px; }
+    label { display: block; margin: 22px 0 8px; font-size: 13px; color: #ddd; }
+    input { width: 100%; padding: 13px 14px; border-radius: 9px; border: 1px solid #454545; outline: none; background: #090909; color: #fff; font-size: 15px; }
+    input:focus { border-color: #c5a059; box-shadow: 0 0 0 3px #c5a05922; }
+    button { width: 100%; margin-top: 18px; padding: 13px 16px; border: 0; border-radius: 9px; background: #c5a059; color: #111; font-weight: 700; font-size: 14px; cursor: pointer; }
+    button:hover { background: #d8b46d; }
+    .error { padding: 10px 12px; border-radius: 8px; color: #fecaca; background: #7f1d1d44; border: 1px solid #ef444455; }
+    .back { display: inline-block; margin-top: 20px; color: #c5a059; text-decoration: none; font-size: 13px; }
+    .user { color: #eee; font-weight: 600; }
+    .note { margin-top: 18px; font-size: 12px; color: #888; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="eyebrow">NexusAI · Security Check</div>
+    <h1>Confirm Admin Access</h1>
+    <p>You are signed in as <span class="user">{{ request.user.username|escape }}</span>. Enter your password again to open Django Admin.</p>
+    <p>This extra check does not sign you out of the main NexusAI application.</p>
+    {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+    <form method="post" autocomplete="off">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next|escape }}">
+      <label for="admin-password">Account password</label>
+      <input id="admin-password" name="admin_reauth_password" type="password" autocomplete="off" required autofocus>
+      <button type="submit">Verify &amp; Open Django Admin</button>
+    </form>
+    <a class="back" href="http://127.0.0.1:3000/">← Back to NexusAI</a>
+    <p class="note">For your security, admin access is re-verified after 5 minutes of inactivity and whenever you open it from the NexusAI button.</p>
+  </main>
+</body>
+</html>

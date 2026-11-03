@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    UserProfile, Project, Requirement, ArchNode, ArchConnection, DatabaseTable,
+    UserProfile, Project, Requirement, ArchNode, ArchConnection, DatabaseTable, ProjectDatabaseDesign,
     AgentInfo, CodeFile, TestCase, TaskItem, TeamMember, NotificationItem, CiCdPipeline, SystemSetting
 )
 
@@ -30,3 +30,5 @@ admin.site.register(TeamMember)
 admin.site.register(NotificationItem)
 admin.site.register(CiCdPipeline)
 admin.site.register(SystemSetting)
+
+admin.site.register(ProjectDatabaseDesign)

@@ -29,12 +29,12 @@
       <div class="space-y-4 text-xs">
         <div class="space-y-1">
           <label class="text-white/70 font-semibold uppercase">Primary Model Alias</label>
-          <input type="text" value="gemini-3.6-flash" readonly class="w-full bg-[#121212] border border-white/10 rounded-lg p-2.5 text-white/70 font-mono">
+          <input id="nexus-setting-model" type="text" value="gemini-3.6-flash" class="w-full bg-[#121212] border border-white/10 rounded-lg p-2.5 text-white font-mono">
         </div>
 
         <div class="space-y-1">
           <label class="text-white/70 font-semibold uppercase">Temperature (Creativity Ratio)</label>
-          <input type="range" min="0" max="1" step="0.1" value="0.2" class="w-full accent-[#C5A059]">
+          <input id="nexus-setting-temperature" type="range" min="0" max="1" step="0.1" value="0.2" class="w-full accent-[#C5A059]">
           <div class="flex justify-between text-[10px] font-mono text-white/40">
             <span>Deterministic (0.0)</span>
             <span>Creative (1.0)</span>
@@ -43,12 +43,13 @@
 
         <div class="space-y-1">
           <label class="text-white/70 font-semibold uppercase">Max Token Generation Limit</label>
-          <input type="number" value="8192" class="w-full bg-[#121212] border border-white/10 rounded-lg p-2.5 text-white font-mono">
+          <input id="nexus-setting-max-tokens" type="number" min="256" max="131072" step="1" value="8192" class="w-full bg-[#121212] border border-white/10 rounded-lg p-2.5 text-white font-mono">
         </div>
 
-        <button onclick="showToast('Settings Saved', 'System configuration updated successfully.', 'success')" class="w-full bg-[#C5A059] text-[#0D0D0D] font-bold py-2.5 rounded-lg hover:bg-[#d8b46d] transition-colors">
+        <button id="nexus-save-settings" type="button" class="w-full bg-[#C5A059] text-[#0D0D0D] font-bold py-2.5 rounded-lg hover:bg-[#d8b46d] transition-colors">
           Save System Settings
         </button>
+        <p id="nexus-settings-status" class="text-xs text-white/60" role="status">Loading saved preferences...</p>
       </div>
     </div>
 
@@ -81,4 +82,29 @@
   </div>
 
 </div>
+<script>
+(() => {
+  const model = document.getElementById('nexus-setting-model');
+  const temperature = document.getElementById('nexus-setting-temperature');
+  const tokens = document.getElementById('nexus-setting-max-tokens');
+  const button = document.getElementById('nexus-save-settings');
+  const status = document.getElementById('nexus-settings-status');
+  if (!model || !temperature || !tokens || !button || !status) return;
+  const endpoint = '/django-api/settings/';
+  const csrf = () => { const m = document.cookie.match(/(?:^|; )csrftoken=([^;]*)/); return m ? decodeURIComponent(m[1]) : ''; };
+  const show = message => { status.textContent = message; };
+  fetch(endpoint, { credentials: 'same-origin', headers: { Accept: 'application/json' } })
+    .then(async response => { const data = await response.json(); if (!response.ok || !data.success) throw new Error(data.detail || `HTTP ${response.status}`); return data.settings; })
+    .then(data => { model.value = data.primary_model; temperature.value = data.temperature; tokens.value = data.max_tokens; show('Saved preferences loaded.'); })
+    .catch(error => show(`Unable to load settings: ${error.message}`));
+  button.addEventListener('click', async () => {
+    button.disabled = true; show('Saving preferences...');
+    try {
+      const response = await fetch(endpoint, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRFToken': csrf() }, body: JSON.stringify({ primary_model: model.value, temperature: Number(temperature.value), max_tokens: Number(tokens.value) }) });
+      const data = await response.json(); if (!response.ok || !data.success) throw new Error(data.detail || `HTTP ${response.status}`);
+      show('Settings saved successfully.'); if (typeof window.showToast === 'function') window.showToast('Settings Saved', 'Your preferences have been saved.', 'success');
+    } catch (error) { show(`Save failed: ${error.message}`); } finally { button.disabled = false; }
+  });
+})();
+</script>
 {% endblock %}

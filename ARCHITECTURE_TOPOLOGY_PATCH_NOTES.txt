@@ -1,0 +1,26 @@
+NEXUSAI ARCHITECTURE & TOPOLOGY PATCH
+
+Files:
+- nexusai_app/models.py: adds ArchitectureDesign version snapshots.
+- nexusai_app/migrations/0005_architecturedesign.py: creates the snapshot table.
+- nexusai_app/architecture_api.py: project-scoped version-aware GET/PUT API.
+- static/js/ai.js: adds Microservices and Layered selectors plus saved-design history.
+- server.ts: asks the AI provider to generate the selected architecture style.
+
+Apply:
+1. Stop Node and Django.
+2. Extract this ZIP into F:\Projects\Nexus-AI, preserving folders and replacing files.
+3. Run:
+   .\.venv\Scripts\python.exe manage.py migrate
+4. Start Django:
+   .\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8000
+5. Start Node in another terminal:
+   npm.cmd run dev
+6. Open a project workspace, then Architecture Topology.
+7. Select Microservices or Layered / Monolithic, then Generate Architecture with AI.
+8. Use Saved designs to reopen older saved versions.
+
+Existing ArchNode/ArchConnection tables and project records are not deleted by the migration.
+Each successful generation creates a separate ArchitectureDesign snapshot. The current graph tables continue to hold the active graph for existing dashboard consumers.
+
+Note: Architecture generation requires a selected project and a working configured AI provider.

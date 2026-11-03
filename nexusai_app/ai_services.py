@@ -29,7 +29,7 @@ Return JSON array with objects matching schema:
 
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.5-flash',
             contents=prompt,
             config={'response_mime_type': 'application/json'}
         )
@@ -66,7 +66,7 @@ Connection fields: id, from, to, label, protocol."""
 
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.5-flash',
             contents=prompt,
             config={'response_mime_type': 'application/json'}
         )
@@ -98,7 +98,7 @@ Return JSON: {{ "refactoredCode": "string", "securityScore": number, "findings":
 
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.5-flash',
             contents=prompt,
             config={'response_mime_type': 'application/json'}
         )

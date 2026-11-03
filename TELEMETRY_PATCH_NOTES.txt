@@ -1,0 +1,21 @@
+NexusAI Telemetry & Analytics patch
+
+This is a safe additive patch because your local urls.py has received changes from earlier module patches.
+1) Copy nexusai_app/telemetry_api.py into F:\Projects\Nexus-AI\nexusai_app\
+2) In nexusai_app/urls.py:
+   - Add telemetry_api to the existing import from ".".
+   - Add this route inside urlpatterns:
+     path('api/telemetry/overview/', telemetry_api.telemetry_overview, name='telemetry_overview'),
+3) Replace the existing <div id="view-analytics"...>...</div> block in index.html with ANALYTICS_VIEW.html.
+4) Add this script before </body> in index.html:
+   <script src="/static/js/telemetry.js"></script>
+5) Copy static/js/telemetry.js to F:\Projects\Nexus-AI\static\js\telemetry.js
+6) Restart Django and Node, then Ctrl+F5.
+
+Endpoint: /api/telemetry/overview/ (frontend proxy path /django-api/telemetry/overview/)
+No migrations. No DB reset. No changes to .env.
+
+Data included: user-owned projects, requirements, tasks, architecture nodes/connections, code files, database tables, analysis records and test cases.
+Not included: provider token quotas or swarm execution history, because those are not persisted in the supplied database schema. The UI explicitly states this instead of fabricating metrics.
+
+The supplied backup predates the later task migration. The telemetry endpoint intentionally uses only stable model fields and works with the current schema.

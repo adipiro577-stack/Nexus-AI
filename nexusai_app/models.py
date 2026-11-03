@@ -31,6 +31,47 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+class ProjectAnalysis(models.Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='analyses'
+    )
+
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_project_analyses'
+    )
+
+    title = models.CharField(max_length=255)
+    prompt = models.TextField()
+    category = models.CharField(max_length=100, default='General')
+
+    provider = models.CharField(max_length=50, default='Google Gemini')
+    model = models.CharField(max_length=100, default='gemini-3.8-flash')
+
+    thinking_summaries = models.JSONField(default=list, blank=True)
+    requirements_snapshot = models.JSONField(default=list)
+    import_summary = models.JSONField(default=dict, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(
+                fields=['project', 'created_at'],
+                name='analysis_project_created_idx'
+            )
+        ]
+
+    def __str__(self):
+        return self.title
+
+
 class Requirement(models.Model):
     PRIORITY_CHOICES = [
         ('high', 'High'),
@@ -49,7 +90,22 @@ class Requirement(models.Model):
         ('in-progress', 'In Progress'),
         ('completed', 'Completed'),
     ]
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='requirements', null=True, blank=True)
+	
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='requirements',
+        null=True,
+        blank=True
+    )
+
+    source_analysis = models.ForeignKey(
+        ProjectAnalysis,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='imported_requirements'
+    )
     title = models.CharField(max_length=255)
     description = models.TextField()
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
@@ -169,6 +225,8 @@ class TaskItem(models.Model):
     assigned_agent = models.CharField(max_length=100)
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='backlog')
+    sprint = models.CharField(max_length=100, default='Sprint 1', blank=True)
+    due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -184,6 +242,8 @@ class TeamMember(models.Model):
         return self.name
 
 class NotificationItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='nexus_notifications')
+    created_at = models.DateTimeField(auto_now_add=True)
     TYPE_CHOICES = [
         ('info', 'Info'),
         ('success', 'Success'),
@@ -200,6 +260,11 @@ class NotificationItem(models.Model):
         return self.title
 
 class CiCdPipeline(models.Model):
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, null=True, blank=True,
+        related_name='cicd_pipelines'
+    )
+    stages = models.JSONField(default=list, blank=True)
     name = models.CharField(max_length=255)
     branch = models.CharField(max_length=100, default='main')
     status = models.CharField(max_length=50, default='success')
@@ -216,3 +281,23 @@ class SystemSetting(models.Model):
 
     def __str__(self):
         return f"{self.key}: {self.value}"
+
+
+class ProjectDatabaseDesign(models.Model):
+    """AI-generated database/ORM design saved separately for each project."""
+    project = models.OneToOneField(
+        Project, on_delete=models.CASCADE, related_name='database_design'
+    )
+    created_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='created_database_designs'
+    )
+    provider = models.CharField(max_length=50, default='Google Gemini')
+    model = models.CharField(max_length=120, default='gemini-3.8-flash')
+    tables = models.JSONField(default=list)
+    django_models = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Database design for {self.project.name}"

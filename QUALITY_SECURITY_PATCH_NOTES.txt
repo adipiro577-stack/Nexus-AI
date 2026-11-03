@@ -1,0 +1,5 @@
+NexusAI Quality & Security patch
+- Project-scoped rule-based static checks on saved CodeFile records.
+- Uses existing project test runner endpoint and existing TestCase records.
+- Does not execute saved project code. This is not a penetration test or compliance certification.
+- No model changes or migration required.

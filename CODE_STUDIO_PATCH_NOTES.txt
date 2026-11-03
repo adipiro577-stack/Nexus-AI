@@ -1,0 +1,1 @@
+Code Studio beginner workflow patch. Files: index.html, static/js/ai.js, server.ts. Adds beginner steps, language selection, selected project context and project-required actions. Existing save/load and AI provider logic retained. No database migration. Do not replace .env or db.sqlite3.

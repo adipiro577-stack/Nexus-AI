@@ -1,0 +1,5 @@
+NexusAI Agent Swarm patch
+Files:
+- server.ts: expands selected-project context supplied to the six real AI agents (requirements, tasks, saved code file metadata, architecture, analysis history and database design). Existing authenticated SSE execution and provider fallback are retained.
+- static/js/swarm.js: improves project list response handling, selects active workspace project when available, reports project loading and agent failures clearly, and safely processes the final SSE frame.
+No database model or migration changes. Execution is real sequential AI provider calls; it is not parallel execution. Results are available in the current session and can be copied/exported to PDF; this patch does not add persistent run history.

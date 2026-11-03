@@ -6,3 +6,23 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Python virtual environments and bytecode
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local databases, credential workbooks, and debug artifacts
+/db.sqlite3
+/users.xlsx
+/auth_debug.txt
+/backend.pid
+/frontend.pid
+/nexus.cmd.bak*
+/debug_login.py
+/inspect_users.py
+/complete_login_test.py
+/fix_auth_test.py
+/fix_login_flow.py
+/test_auth.py
